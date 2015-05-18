@@ -8,6 +8,8 @@ RUN apt-get update \
         && echo "deb https://repo.varnish-cache.org/debian/ jessie varnish-4.0" >> /etc/apt/sources.list.d/varnish-cache.list \
         && apt-get update \
         && apt-get install -y varnish=$VARNISH_VERSION
-        
-CMD ["varnishd"]
+
+COPY varnish.vcl /etc/varnish.vcl
+
+CMD ["varnishd","-f","/etc/varnish.vcl"]
 

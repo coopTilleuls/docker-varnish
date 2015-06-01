@@ -11,5 +11,4 @@ RUN apt-get update \
 
 COPY varnish.vcl /etc/varnish.vcl
 
-CMD ["varnishd","-f","/etc/varnish.vcl"]
-
+CMD ["varnishd", "-F", "-f", "/etc/varnish.vcl"]

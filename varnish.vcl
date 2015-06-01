@@ -45,30 +45,34 @@ vcl 4.0;
 # Client side
 
 sub vcl_recv {
-    if (req.method == "PRI") {
-	/* We do not support SPDY or HTTP/2.0 */
-	return (synth(405));
-    }
-    if (req.method != "GET" &&
-      req.method != "HEAD" &&
-      req.method != "PUT" &&
-      req.method != "POST" &&
-      req.method != "TRACE" &&
-      req.method != "OPTIONS" &&
-      req.method != "DELETE") {
-        /* Non-RFC2616 or CONNECT which is weird. */
-        return (pipe);
-    }
 
-    if (req.method != "GET" && req.method != "HEAD") {
-        /* We only deal with GET and HEAD by default */
-        return (pass);
-    }
-    if (req.http.Authorization || req.http.Cookie) {
-        /* Not cacheable by default */
-        return (pass);
-    }
-    return (hash);
+  if (req.method == "PRI") {
+    /* We do not support SPDY or HTTP/2.0 */
+    return (synth(405));
+  }
+
+  if (req.method != "GET" &&
+    req.method != "HEAD" &&
+    req.method != "PUT" &&
+    req.method != "POST" &&
+    req.method != "TRACE" &&
+    req.method != "OPTIONS" &&
+    req.method != "DELETE") {
+      /* Non-RFC2616 or CONNECT which is weird. */
+      return (pipe);
+  }
+
+  if (req.method != "GET" && req.method != "HEAD") {
+      /* We only deal with GET and HEAD by default */
+      return (pass);
+  }
+
+  if (req.http.Authorization || req.http.Cookie) {
+      /* Not cacheable by default */
+      return (pass);
+  }
+
+  return (hash);
 }
 
 sub vcl_pipe {
@@ -148,23 +152,32 @@ sub vcl_synth {
 # Backend Fetch
 
 sub vcl_backend_fetch {
-    return (fetch);
+  return (fetch);
 }
 
+# CUSTOM
 sub vcl_backend_response {
-    if (beresp.ttl <= 0s ||
-      beresp.http.Set-Cookie ||
-      beresp.http.Surrogate-control ~ "no-store" ||
-      (!beresp.http.Surrogate-Control &&
-        beresp.http.Cache-Control ~ "no-cache|no-store|private") ||
-      beresp.http.Vary == "*") {
-        /*
-        * Mark as "Hit-For-Pass" for the next 2 minutes
-        */
-        set beresp.ttl = 120s;
-        set beresp.uncacheable = true;
-    }
-    return (deliver);
+
+  # Handle TTLs that are two high.
+  if (beresp.ttl > 1s) {
+    set beresp.ttl = 1s;
+    set beresp.http.cache-control = "max-age=1";
+  }
+
+  # Handle uncacheable responses.
+  if (beresp.ttl <= 0s ||
+    beresp.http.Set-Cookie ||
+    beresp.http.Surrogate-control ~ "no-store" ||
+    (!beresp.http.Surrogate-Control &&
+      beresp.http.Cache-Control ~ "no-cache|no-store|private") ||
+    beresp.http.Vary == "*") {
+      /*
+      * Mark as "Hit-For-Pass" for the next 2 minutes
+      */
+      set beresp.ttl = 120s;
+      set beresp.uncacheable = true;
+  }
+  return (deliver);
 }
 
 sub vcl_backend_error {
@@ -200,15 +213,7 @@ sub vcl_fini {
 }
 
 backend ap1 {
-  .host = "127.0.0.1";
-  .port = "8080";
+  .host = "backend";
+  .port = "80";
   .first_byte_timeout = 200s;
-  .probe = {
-         .url = "/";
-         .interval = 5s;
-         .timeout = 1 s;
-         .window = 5;
-         .threshold = 3;
-         .initial = 1;
-  }
 }

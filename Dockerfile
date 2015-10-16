@@ -35,6 +35,7 @@ RUN \
   tar -xzf libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
   cd libvmod-querystring-$QUERYSTRING_VERSION && \
   ./autogen.sh && \
+  ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
   make install && \
   rm ../libvmod-querystring-$QUERYSTRING_VERSION.tar.gz
 

@@ -35,11 +35,9 @@ RUN \
   tar -xzf libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
   cd libvmod-querystring-$QUERYSTRING_VERSION && \
   ./autogen.sh && \
-  ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
   make install && \
   rm ../libvmod-querystring-$QUERYSTRING_VERSION.tar.gz
 
-ADD default.vcl /etc/varnish/default.vcl
 ADD start-varnishd.sh /usr/local/bin/start-varnishd
 
 ENV VARNISH_PORT 80
@@ -47,3 +45,5 @@ ENV VARNISH_MEMORY 100m
 
 EXPOSE 80
 CMD ["start-varnishd"]
+
+ONBUILD ADD default.vcl /etc/varnish/default.vcl

@@ -4,7 +4,7 @@ RUN \
   useradd -r -s /bin/false varnishd
 
 # Install Varnish dependencies
-RUN apt-get -qq update && \
+RUN apt-get update && \
   apt-get install -y --no-install-recommends \
     libjemalloc-dev \
     libpcre3-dev \
@@ -24,8 +24,8 @@ RUN \
   ./autogen.sh && \
   ./configure && \
   make install && \
-  rm ../varnish-$VARNISH_VERSION.tar.gz && \
-  find /usr/local/man/ -name 'v*' -exec rm {} \;
+  rm ../varnish-$VARNISH_VERSION.tar.gz
+
 
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION=0.3

@@ -1,22 +1,14 @@
-FROM debian:jessie
+FROM buildpack-deps:jessie
 
-# Install base system
+RUN \
+  useradd -r -s /bin/false varnishd
+
+# Install Varnish dependencies
 RUN apt-get -qq update && \
   apt-get install -y --no-install-recommends \
-    automake \
-    autotools-dev \
-    curl \
-    dpkg-dev \
-    graphviz \
-    libedit-dev \
     libjemalloc-dev \
-    libncurses-dev \
     libpcre3-dev \
-    libtool \
-    pkg-config \
     python-docutils \
-    python-sphinx \
-    ca-certificates \ 
   && rm -rf /var/lib/apt/lists/*
 
 # Install Varnish from source
@@ -32,8 +24,8 @@ RUN \
   ./autogen.sh && \
   ./configure && \
   make install && \
+  rm ../varnish-$VARNISH_VERSION.tar.gz && \
   find /usr/local/man/ -name 'v*' -exec rm {} \;
-
 
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION=0.3
@@ -45,25 +37,13 @@ RUN \
   ./autogen.sh && \
   ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
   make install && \
-  make check && \
-  find /usr/local/man/ -name 'v*' -exec rm {} \;
+  rm ../libvmod-querystring-$QUERYSTRING_VERSION.tar.gz
 
-# # Varnish shared library installs to obscure location, so make that available via ldconfig.
-# # This seems awkward, I wonder if there's a way to stipulate putting this shared object file
-# # in `/usr/lib/`. Granted I know nothing about UNIX folder layout.
-# RUN ldconfig && ldconfig -n /usr/local/lib/
-
-# # Make our custom VCLs available on the container
 ADD default.vcl /etc/varnish/default.vcl
+ADD start-varnishd.sh /usr/local/bin/start-varnishd
 
-# # Export environment variables
 ENV VARNISH_PORT 80
 ENV VARNISH_MEMORY 100m
 
-# # Expose port 80
 EXPOSE 80
-ADD start /start
-
-RUN chmod 0755 /start
-
-CMD ["/start"]
+CMD ["start-varnishd"]

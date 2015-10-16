@@ -16,21 +16,18 @@ import querystring;
 
 # Default backend definition. Set this to point to your content server.
 backend nytco {
-	# todo define back-end host
-	.host = "nginx";
+	.host = "127.0.0.1";
 	.port = "8080";
 }
 
 # Define an access control list to restrict cache purging.
 acl purge {
 	"192.168.33.1"/8;
+
 }
 
 sub vcl_recv {
-	# todo define host name
-	#if (req.http.host == "{{environment-specific-hostname}}") {
-	#	set req.backend_hint = nytco;
-	#}
+
 	# Fall-through for admin interface requests
 	if (req.url~ "^/wp-admin/") {
 		return (pass);
@@ -39,17 +36,18 @@ sub vcl_recv {
 	# Purge the cache if the client is allowed to.
 	if (req.method == "PURGE") {
 		if (!client.ip ~ purge) {
-			return(synth(405,"Not allowed."));
+			return(synth(405, "Not allowed."));
 		}
 		return (purge);
 	}
 
-	set req.http.host = "dev.nytco.com";
-	# Remove querystrings.
-	set req.url = querystring.remove(req.url);
+
+	if (req.url ~ ".nytco.com$") {
+			set req.url = querystring.remove(req.url);
 
 	# Ignore all cookies.
 	unset req.http.cookie;
+	}
 }
 
 sub vcl_backend_response {

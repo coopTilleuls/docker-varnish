@@ -1,52 +1,67 @@
-FROM ubuntu:15.04
-
-ENV DEBIAN_FRONTEND noninteractive
-
-# Update apt sources
-#RUN echo "deb http://archive.ubuntu.com/ubuntu precise main universe" > /etc/apt/sources.list
-
-# Update the package repository
-RUN apt-get -qq update
+FROM debian:jessie
 
 # Install base system
-RUN apt-get install -y vim git dpkg-dev curl \
-    # Varnish build dependencies.
-    automake autotools-dev libedit-dev libjemalloc-dev libncurses-dev libpcre3-dev libtool pkg-config python-docutils python-sphinx graphviz
+RUN apt-get -qq update && \
+  apt-get install -y --no-install-recommends \
+    automake \
+    autotools-dev \
+    curl \
+    dpkg-dev \
+    graphviz \
+    libedit-dev \
+    libjemalloc-dev \
+    libncurses-dev \
+    libpcre3-dev \
+    libtool \
+    pkg-config \
+    python-docutils \
+    python-sphinx \
+    ca-certificates \ 
+  && rm -rf /var/lib/apt/lists/*
 
-# Build Varnish from source because that's required to install Varnish modules :D
-RUN cd /usr/local/src/ && apt-get source varnish && \
-    cd varnish-4.0.2 && \
-    sh autogen.sh && \
-    sh configure && \
-    make && \
-    make install
+# Install Varnish from source
+ENV VARNISH_VERSION=4.1.0
+ENV VARNISH_SHA256SUM=4a6ea08e30b62fbf25f884a65f0d8af42e9cc9d25bf70f45ae4417c4f1c99017
+RUN \
+  mkdir -p /usr/local/src && \
+  cd /usr/local/src && \
+  curl -sfLO https://repo.varnish-cache.org/source/varnish-$VARNISH_VERSION.tar.gz && \
+  echo "${VARNISH_SHA256SUM}  varnish-$VARNISH_VERSION.tar.gz" | sha256sum -c - && \
+  tar -xzf varnish-$VARNISH_VERSION.tar.gz && \
+  cd varnish-$VARNISH_VERSION && \
+  ./autogen.sh && \
+  ./configure && \
+  make install && \
+  find /usr/local/man/ -name 'v*' -exec rm {} \;
 
-# RUN apt-get install -y build-essential libtool
 
 # Install Querystring Varnish module
-RUN cd /usr/local/src/ && \
-    git clone https://github.com/Dridi/libvmod-querystring && \
-    cd /usr/local/src/libvmod-querystring && \
-    ./autogen.sh && \
-    ./configure VARNISHSRC=/usr/local/src/varnish-4.0.2 && \
-    make  && \
-    make install && \
-    make check
+ENV QUERYSTRING_VERSION=0.3
+RUN \
+  cd /usr/local/src/ && \
+  curl -sfL https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz -o libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
+  tar -xzf libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
+  cd libvmod-querystring-$QUERYSTRING_VERSION && \
+  ./autogen.sh && \
+  ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
+  make install && \
+  make check && \
+  find /usr/local/man/ -name 'v*' -exec rm {} \;
 
-# Varnish shared library installs to obscure location, so make that available via ldconfig.
-# This seems awkward, I wonder if there's a way to stipulate putting this shared object file
-# in `/usr/lib/`. Granted I know nothing about UNIX folder layout.
-RUN ldconfig && ldconfig -n /usr/local/lib/
+# # Varnish shared library installs to obscure location, so make that available via ldconfig.
+# # This seems awkward, I wonder if there's a way to stipulate putting this shared object file
+# # in `/usr/lib/`. Granted I know nothing about UNIX folder layout.
+# RUN ldconfig && ldconfig -n /usr/local/lib/
 
-# Make our custom VCLs available on the container
+# # Make our custom VCLs available on the container
 ADD default.vcl /etc/varnish/default.vcl
 
-# Export environment variables
+# # Export environment variables
 ENV VARNISH_PORT 80
+ENV VARNISH_MEMORY 100m
 
-# Expose port 80
+# # Expose port 80
 EXPOSE 80
-
 ADD start /start
 
 RUN chmod 0755 /start

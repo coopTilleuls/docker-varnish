@@ -15,25 +15,20 @@ vcl 4.0;
 import querystring;
 
 # Default backend definition. Set this to point to your content server.
-backend nytco {
+backend www {
 	.host = "127.0.0.1";
 	.port = "8080";
 }
 
 # Define an access control list to restrict cache purging.
 acl purge {
-	"192.168.33.1"/8;
-
+	"127.0.0.1";
+	"192.168.0.0"/16;
 }
 
 sub vcl_recv {
 
-	# Fall-through for admin interface requests
-	if (req.url~ "^/wp-admin/") {
-		return (pass);
-	}
-
-	# Purge the cache if the client is allowed to.
+	# https://github.com/mattiasgeniar/varnish-4.0-configuration-templates/blob/master/default.vcl
 	if (req.method == "PURGE") {
 		if (!client.ip ~ purge) {
 			return(synth(405, "Not allowed."));
@@ -41,13 +36,71 @@ sub vcl_recv {
 		return (purge);
 	}
 
+  if (req.method != "GET" &&
+      req.method != "HEAD" &&
+      req.method != "PUT" &&
+      req.method != "POST" &&
+      req.method != "TRACE" &&
+      req.method != "OPTIONS" &&
+      req.method != "PATCH" &&
+      req.method != "DELETE") {
+    return (pipe);
+  }
 
-	if (req.url ~ ".nytco.com$") {
-			set req.url = querystring.remove(req.url);
+  # Implementing websocket support (https://www.varnish-cache.org/docs/4.0/users-guide/vcl-example-websockets.html)
+  if (req.http.Upgrade ~ "(?i)websocket") {
+    return (pipe);
+  }
 
-	# Ignore all cookies.
-	unset req.http.cookie;
+  if (req.method != "GET" && req.method != "HEAD") {
+    return (pass);
+  }
+
+  if (req.http.Authorization) {
+    return (pass);
+  }
+
+	if (req.url~ "^/wp-admin/") {
+		return (pass);
 	}
+
+
+	####
+
+  if (req.url ~ "\#") {
+    set req.url = regsub(req.url, "\#.*$", "");
+  }
+
+  if (req.url ~ "^[^?]*\.(bmp|bz2|css|doc|eot|flv|gif|gz|ico|jpeg|jpg|js|less|pdf|png|rtf|swf|txt|woff|xml)(\?.*)?$") {
+    unset req.http.Cookie;
+    set req.url = querystring.remove(req.url);
+    return (hash);
+  }
+
+	set req.url = querystring.clean(req.url);
+
+  if (req.url ~ "\?") {
+    set req.url = querystring.sort(req.url);
+  }
+
+  return (hash);
+}
+
+sub vcl_hash {
+
+  hash_data(req.url);
+  
+  if (req.http.host) {
+    hash_data(req.http.host);
+  } else {
+    hash_data(server.ip);
+  }
+  
+  if (req.http.origin) {
+  	hash_data(req.http.origin);
+  }
+  
+  return (lookup);
 }
 
 sub vcl_backend_response {
@@ -59,8 +112,6 @@ sub vcl_backend_response {
 
 sub vcl_deliver {
 	# Fall-through for dev that doesn't work right now. Prob need to do something with beresp too.
-	set resp.http.age = "0";
-
 	# Happens when we have all the pieces we need, and are about to send the
 	# response to the client.
 	#

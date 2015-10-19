@@ -1,20 +1,26 @@
-FROM buildpack-deps:jessie
+FROM debian:jessie
 
 RUN \
-  useradd -r -s /bin/false varnishd
-
-# Install Varnish dependencies
-RUN apt-get update && \
+  apt-get update && \
   apt-get install -y --no-install-recommends \
+    automake \
+    build-essential \
+    ca-certificates \
+    curl \
+    libedit-dev \
     libjemalloc-dev \
+    libncurses-dev \
     libpcre3-dev \
+    libtool \
+    pkg-config \
     python-docutils \
-  && rm -rf /var/lib/apt/lists/*
+  && rm -rf /var/lib/apt/lists/* 
 
 # Install Varnish from source
 ENV VARNISH_VERSION=4.1.0
 ENV VARNISH_SHA256SUM=4a6ea08e30b62fbf25f884a65f0d8af42e9cc9d25bf70f45ae4417c4f1c99017
 RUN \
+  apt-get update && \
   mkdir -p /usr/local/src && \
   cd /usr/local/src && \
   curl -sfLO https://repo.varnish-cache.org/source/varnish-$VARNISH_VERSION.tar.gz && \
@@ -25,7 +31,6 @@ RUN \
   ./configure && \
   make install && \
   rm ../varnish-$VARNISH_VERSION.tar.gz
-
 
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION=0.3
@@ -48,3 +53,4 @@ EXPOSE 80
 CMD ["start-varnishd"]
 
 ONBUILD ADD default.vcl /etc/varnish/default.vcl
+ONBUILD RUN varnishd -C -f /etc/varnish/default.vcl > /dev/null

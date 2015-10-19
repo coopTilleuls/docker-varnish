@@ -42,7 +42,7 @@ RUN \
   ./autogen.sh && \
   ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
   make install && \
-  rm ../libvmod-querystring-$QUERYSTRING_VERSION.tar.gz
+  rm -r ../libvmod-querystring-$QUERYSTRING_VERSION*
 
 ADD start-varnishd.sh /usr/local/bin/start-varnishd
 

@@ -1,6 +1,9 @@
 FROM debian:jessie
 
 RUN \
+  useradd -r -s /bin/false varnishd
+
+RUN \
   apt-get update && \
   apt-get install -y --no-install-recommends \
     automake \
@@ -53,4 +56,4 @@ EXPOSE 80
 CMD ["start-varnishd"]
 
 ONBUILD ADD default.vcl /etc/varnish/default.vcl
-ONBUILD RUN varnishd -C -f /etc/varnish/default.vcl > /dev/null
+ONBUILD RUN varnishd -C -f /etc/varnish/default.vcl

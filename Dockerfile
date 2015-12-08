@@ -44,4 +44,3 @@ EXPOSE 80
 CMD ["start-varnishd"]
 
 ONBUILD ADD default.vcl /etc/varnish/default.vcl
-ONBUILD RUN varnishd -C -f /etc/varnish/default.vcl

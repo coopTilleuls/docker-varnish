@@ -17,9 +17,9 @@ RUN \
     libtool \
     pkg-config \
     python-docutils \
-  && rm -rf /var/lib/apt/lists/* 
+  && rm -rf /var/lib/apt/lists/*
 
-# Install Varnish from source
+# Install Varnish from source, so that Varnish modules can be compiled and installed.
 ENV VARNISH_VERSION=4.1.0
 ENV VARNISH_SHA256SUM=4a6ea08e30b62fbf25f884a65f0d8af42e9cc9d25bf70f45ae4417c4f1c99017
 RUN \
@@ -34,18 +34,6 @@ RUN \
   ./configure && \
   make install && \
   rm ../varnish-$VARNISH_VERSION.tar.gz
-
-# Install Querystring Varnish module
-ENV QUERYSTRING_VERSION=0.3
-RUN \
-  cd /usr/local/src/ && \
-  curl -sfL https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz -o libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
-  tar -xzf libvmod-querystring-$QUERYSTRING_VERSION.tar.gz && \
-  cd libvmod-querystring-$QUERYSTRING_VERSION && \
-  ./autogen.sh && \
-  ./configure VARNISHSRC=/usr/local/src/varnish-$VARNISH_VERSION && \
-  make install && \
-  rm -r ../libvmod-querystring-$QUERYSTRING_VERSION*
 
 ADD start-varnishd.sh /usr/local/bin/start-varnishd
 

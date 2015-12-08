@@ -35,7 +35,7 @@ RUN \
   make install && \
   rm ../varnish-$VARNISH_VERSION.tar.gz
 
-ADD start-varnishd.sh /usr/local/bin/start-varnishd
+COPY start-varnishd.sh /usr/local/bin/start-varnishd
 
 ENV VARNISH_PORT 80
 ENV VARNISH_MEMORY 100m
@@ -43,4 +43,4 @@ ENV VARNISH_MEMORY 100m
 EXPOSE 80
 CMD ["start-varnishd"]
 
-ONBUILD ADD default.vcl /etc/varnish/default.vcl
+ONBUILD COPY default.vcl /etc/varnish/default.vcl

@@ -64,6 +64,10 @@ RUN \
   rm -r ../libvmod-querystring-$QUERYSTRING_VERSION*
 ```
 
+# License
+
+View [license information](https://www.apache.org/licenses/LICENSE-2.0) for the software contained in this image.
+
 # Supported Docker versions
 
 This image is supported on Docker version 1.9.1.

@@ -1,24 +1,26 @@
 # Varnish
 
-# Supported tags and respective `Dockerfile` links
+## Supported tags and respective `Dockerfile` links
 
-# What is Varnish?
+-	[`4.1.0`, `4.1`, `4`, `latest` (*4.1.0/Dockerfile*)](https://github.com/newsdev/docker-varnish/blob/4/Dockerfile)
 
-Varnish Cache is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. Varnish Cache is really, really fast. It typically speeds up delivery with a factor of 300 - 1000x, depending on your architecture.
+## What is Varnish?
+
+[Varnish Cache](https://www.varnish-cache.org/) is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. Varnish Cache is really, really fast. It typically speeds up delivery with a factor of 300 - 1000x, depending on your architecture.
 
 > [wikipedia.org/wiki/Varnish_(software)](https://en.wikipedia.org/wiki/Varnish_(software))
 
-# How to use this image.
+## How to use this image.
 
 This image is intended as a base image for other images to built on.
 
-## Create a `Dockerfile` in your Varnish project
+### Create a `Dockerfile` in your Varnish project
 
 ```dockerfile
 FROM newsdev/varnish:4.1.0
 ```
 
-## Create a `default.vcl` in your Varnish project
+### Create a `default.vcl` in your Varnish project
 
 e.g.
 

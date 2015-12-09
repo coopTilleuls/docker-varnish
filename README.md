@@ -40,7 +40,26 @@ $ docker build -t my-varnish .
 $ docker run -it --rm --name my-running-varnish my-varnish
 ```
 
-## Adding VMODs (Varnish Modules)
+### Customize configuration
+
+You can override the port Varnish serves in your Dockerfile.
+
+```dockerfile
+FROM newsdev/varnish:4.1.0
+
+ENV VARNISH_PORT 8080
+EXPOSE 8080
+```
+
+You can override the size of the cache.
+
+```dockerfile
+FROM newsdev/varnish:4.1.0
+
+ENV VARNISH_MEMORY 1G
+```
+
+## How to install VMODs (Varnish Modules)
 
 [Varnish Modules](https://www.varnish-cache.org/vmods) are extensions written for Varnish Cache.
 

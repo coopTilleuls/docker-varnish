@@ -22,8 +22,6 @@ FROM newsdev/varnish:4.1.0
 
 ### Create a `default.vcl` in your Varnish project
 
-e.g.
-
 ```vcl
 vcl 4.0;
 

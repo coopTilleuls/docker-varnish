@@ -3,9 +3,9 @@ FROM debian:jessie
 RUN \
   useradd -r -s /bin/false varnishd
 
+# Install Varnish source build dependencies.
 RUN \
-  apt-get update && \
-  apt-get install -y --no-install-recommends \
+  apt-get update && apt-get install -y --no-install-recommends \
     automake \
     build-essential \
     ca-certificates \
@@ -17,6 +17,7 @@ RUN \
     libtool \
     pkg-config \
     python-docutils \
+  && apt-get clean \
   && rm -rf /var/lib/apt/lists/*
 
 # Install Varnish from source, so that Varnish modules can be compiled and installed.
@@ -27,7 +28,7 @@ RUN \
   mkdir -p /usr/local/src && \
   cd /usr/local/src && \
   curl -sfLO https://repo.varnish-cache.org/source/varnish-$VARNISH_VERSION.tar.gz && \
-  echo "${VARNISH_SHA256SUM}  varnish-$VARNISH_VERSION.tar.gz" | sha256sum -c - && \
+  echo "${VARNISH_SHA256SUM} varnish-$VARNISH_VERSION.tar.gz" | sha256sum -c - && \
   tar -xzf varnish-$VARNISH_VERSION.tar.gz && \
   cd varnish-$VARNISH_VERSION && \
   ./autogen.sh && \

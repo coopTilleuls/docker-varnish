@@ -40,7 +40,8 @@ RUN set -xe \
 	&& cd /usr/local/src/varnish \
 	&& ./autogen.sh \
 	&& ./configure \
-	&& make install
+	&& make install \
+	&& ldconfig
 
 COPY start-varnishd.sh /usr/local/bin/start-varnishd
 

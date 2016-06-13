@@ -1,6 +1,6 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`4.1.2`, `4.1`, `4`, `latest` (*4.1/Dockerfile*)](https://github.com/newsdev/docker-varnish/blob/master/4.1/Dockerfile)
+-	[`4.1.2`, `4.1`, `4`, `latest` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
 
 # What is Varnish?
 
@@ -26,13 +26,13 @@ backend default {
 Then run:
 
 ```console
-$ docker run --name my-running-varnish -v /path/to/default.vcl:/etc/varnish/default.vcl:ro -d newsdev/varnish
+$ docker run --name my-running-varnish -v /path/to/default.vcl:/etc/varnish/default.vcl:ro -d tripviss/varnish
 ```
 
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
 
 ```dockerfile
-FROM newsdev/varnish
+FROM tripviss/varnish
 
 COPY default.vcl /etc/varnish/
 ```
@@ -80,7 +80,7 @@ To install Varnish Modules, you will need the Varnish source to compile against.
 Install VMODs in your Varnish project's Dockerfile. For example, to install the Querystring module:
 
 ```dockerfile
-FROM newsdev/varnish:4.1
+FROM tripviss/varnish:4.1
 
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION 0.3
@@ -102,7 +102,7 @@ View [license information](https://github.com/varnishcache/varnish-cache/blob/ma
 
 # Supported Docker versions
 
-This image is supported on Docker version 1.9.1.
+This image is supported on Docker version 1.11.2.
 
 Support for older versions (down to 1.6) is provided on a best-effort basis.
 
@@ -112,10 +112,10 @@ Please see [the Docker installation documentation](https://docs.docker.com/insta
 
 ## Issues
 
-If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/newsdev/docker-varnish/issues).
+If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/tripviss/docker-varnish/issues).
 
 ## Contributing
 
 You are invited to contribute new features, fixes, or updates, large or small; we are always thrilled to receive pull requests, and do our best to process them as fast as we can.
 
-Before you start to code, we recommend discussing your plans through a [GitHub issue](https://github.com/docker-library/php/issues), especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.
+Before you start to code, we recommend discussing your plans through a [GitHub issue](https://github.com/tripviss/docker-varnish/issues), especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.

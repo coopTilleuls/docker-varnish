@@ -26,9 +26,9 @@ RUN \
 RUN \
 	adduser --quiet --system --no-create-home --group varnish
 
-ENV VARNISH_VERSION 4.1.2
-ENV VARNISH_FILENAME varnish-4.1.2.tar.gz
-ENV VARNISH_SHA256 9728da944d28eb5be90e7ab6799c2c4c831ef4df5e5154537eb7f2e5d5e348c4
+ENV VARNISH_VERSION 4.1.3
+ENV VARNISH_FILENAME varnish-4.1.3.tar.gz
+ENV VARNISH_SHA256 9f9469b9fda2a578da2a9d282c71c34eeb5c42eda7f8d8728284d92282108429
 
 RUN set -xe \
 	&& curl -fSL "https://repo.varnish-cache.org/source/$VARNISH_FILENAME" -o "$VARNISH_FILENAME" \

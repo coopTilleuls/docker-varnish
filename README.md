@@ -1,6 +1,6 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`4.1.2`, `4.1`, `4`, `latest` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
+-	[`4.1.3`, `4.1`, `4`, `latest` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
 
 # What is Varnish?
 

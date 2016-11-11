@@ -1,6 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
--	[`4.1.3`, `4.1`, `4`, `latest` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
+- [`5.0.0`, `5.0`, `5`, `latest` (*5.0/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/5.0/Dockerfile)
+-	[`4.1.3`, `4.1`, `4` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
 
 # What is Varnish?
 
@@ -80,11 +81,11 @@ To install Varnish Modules, you will need the Varnish source to compile against.
 Install VMODs in your Varnish project's Dockerfile. For example, to install the Querystring module:
 
 ```dockerfile
-FROM tripviss/varnish:4.1
+FROM tripviss/varnish:5.0
 
 # Install Querystring Varnish module
-ENV QUERYSTRING_VERSION 0.3
-ENV QUERYSTRING_FILENAME libvmod-querystring-0.3.tar.gz
+ENV QUERYSTRING_VERSION 1.0.1
+ENV QUERYSTRING_FILENAME libvmod-querystring-1.0.1.tar.gz
 RUN \
   curl -fSL "https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
   && tar -xzf "$QUERYSTRING_FILENAME" -C /usr/local/src \
@@ -102,7 +103,7 @@ View [license information](https://github.com/varnishcache/varnish-cache/blob/ma
 
 # Supported Docker versions
 
-This image is supported on Docker version 1.11.2.
+This image is supported on Docker version 1.12.3.
 
 Support for older versions (down to 1.6) is provided on a best-effort basis.
 

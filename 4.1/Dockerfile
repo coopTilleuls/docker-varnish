@@ -23,9 +23,6 @@ RUN \
 	&& apt-get clean \
 	&& rm -rf /var/lib/apt/lists/*
 
-RUN \
-	adduser --quiet --system --no-create-home --group varnish
-
 ENV VARNISH_VERSION 4.1.6
 ENV VARNISH_FILENAME varnish-4.1.6.tar.gz
 ENV VARNISH_SHA256 c7ac460b521bebf772868b2f5aefc2f2508a1e133809cd52d3ba1b312226e849
@@ -45,9 +42,14 @@ RUN set -xe \
 
 COPY start-varnishd.sh /usr/local/bin/start-varnishd
 
+RUN mkdir /varnishfs \
+        && chgrp -R 0 /varnishfs \
+        && chmod -R g+rwX /varnishfs
+
 ENV VCL_CONFIG /etc/varnish/default.vcl
 ENV VARNISH_MEMORY 100m
 
 EXPOSE 6081
+USER 1001
 
 CMD ["start-varnishd"]

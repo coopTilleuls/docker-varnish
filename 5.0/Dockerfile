@@ -5,6 +5,7 @@ RUN \
 	apt-get update && apt-get install -y --no-install-recommends \
 		automake \
 		build-essential \
+		dpkg-dev \
 		libedit-dev \
 		libjemalloc-dev \
 		libncurses-dev \
@@ -39,7 +40,10 @@ RUN set -xe \
 	&& rm "$VARNISH_FILENAME" \
 	&& cd /usr/local/src/varnish \
 	&& ./autogen.sh \
+	&& gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
 	&& ./configure \
+		--build="$gnuArch" \
+	&& make -j "$(nproc)" \
 	&& make install \
 	&& ldconfig
 

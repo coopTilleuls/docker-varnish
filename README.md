@@ -19,8 +19,8 @@ Create a `default.vcl` file:
 vcl 4.0;
 
 backend default {
-    .host = "www.nytimes.com";
-    .port = "80";
+  .host = "www.nytimes.com";
+  .port = "80";
 }
 ```
 
@@ -102,15 +102,20 @@ FROM tripviss/varnish:5.1
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION 1.0.1
 ENV QUERYSTRING_FILENAME libvmod-querystring-1.0.1.tar.gz
-RUN \
-  curl -fSL "https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
-  && tar -xzf "$QUERYSTRING_FILENAME" -C /usr/local/src \
-  && mv "/usr/local/src/libvmod-querystring-$QUERYSTRING_VERSION" /usr/local/src/libvmod-querystring \
-  && rm "$QUERYSTRING_FILENAME" \
-  && cd /usr/local/src/libvmod-querystring \
-  && ./autogen.sh \
-  && ./configure VARNISHSRC=/usr/local/src/varnish \
-  && make install
+RUN set -xe \
+    && curl -fSL "https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
+    && mkdir -p /usr/local/src/libvmod-querystring \
+    && tar -xzf "$QUERYSTRING_FILENAME" -C /usr/local/src/libvmod-querystring --strip-components=1 \
+    && rm "$QUERYSTRING_FILENAME" \
+    && cd /usr/local/src/libvmod-querystring \
+    && ./autogen.sh \
+    && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
+    && ./configure \
+        --build="$gnuArch" \
+        VARNISHSRC=/usr/local/src/varnish \
+    && make -j "$(nproc)" \
+    && make install \
+    && rm -r /usr/local/src/libvmod-querystring
 ```
 
 # License

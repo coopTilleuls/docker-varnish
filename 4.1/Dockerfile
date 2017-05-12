@@ -64,11 +64,13 @@ RUN set -xe \
 	&& ldconfig \
 	&& apt-get purge -y --auto-remove $buildDeps
 
-COPY start-varnishd.sh /usr/local/bin/start-varnishd
+RUN mkdir -p /usr/local/var/varnish && chown varnish:varnish /usr/local/var/varnish
+VOLUME /usr/local/var/varnish
+WORKDIR /usr/local/var/varnish
 
-ENV VCL_CONFIG /etc/varnish/default.vcl
-ENV VARNISH_MEMORY 100m
+COPY docker-varnish-entrypoint /usr/local/bin/
+
+ENTRYPOINT ["docker-varnish-entrypoint"]
 
 EXPOSE 6081
-
-CMD ["start-varnishd"]
+CMD ["varnishd"]

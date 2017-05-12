@@ -1,0 +1,7 @@
+**/*.md
+**/._*
+**/.DS_Store
+**/.gitignore
+**/Thumbs.db
+.dockerignore
+Dockerfile

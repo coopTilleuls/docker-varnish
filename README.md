@@ -69,7 +69,7 @@ $ docker run --name my-running-varnish -e "VARNISH_DAEMON_OPTS=-t 3600 -p http_r
 You can change the path of the VCL configuration file:
 
 ```console
-$ docker run --name my-running-varnish -e "VCL_CONFIG=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro -d my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro -d my-varnish
 ```
 
 You can also change the ports used in a Dockerfile.

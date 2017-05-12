@@ -27,7 +27,7 @@ backend default {
 Then run:
 
 ```console
-$ docker run --name my-running-varnish -v /path/to/default.vcl:/etc/varnish/default.vcl:ro -d tripviss/varnish
+$ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/varnish/default.vcl:ro -d tripviss/varnish
 ```
 
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
@@ -35,7 +35,7 @@ Alternatively, a simple `Dockerfile` can be used to generate a new image that in
 ```dockerfile
 FROM tripviss/varnish:5.1
 
-COPY default.vcl /etc/varnish/
+COPY default.vcl /usr/local/etc/varnish/
 ```
 
 Place this file in the same directory as your `default.vcl`, run `docker build -t my-varnish .`, then start your container:
@@ -63,7 +63,7 @@ $ docker run --name my-running-varnish -e "VARNISH_MEMORY=1G" -d my-varnish
 You can pass additional parameters to the `varnishd` process:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISHD_PARAMS=-t 3600 -p http_req_hdr_len=16384 -p http_resp_hdr_len=16384" -d my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_DAEMON_OPTS=-t 3600 -p http_req_hdr_len=16384 -p http_resp_hdr_len=16384" -d my-varnish
 ```
 
 You can change the path of the VCL configuration file:
@@ -78,7 +78,7 @@ You can also change the ports used in a Dockerfile.
 FROM tripviss/varnish:5.1
 
 ENV VARNISH_PORT 8080
-ENV VARNISHD_PARAMS "additional varnish options here"
+ENV VARNISH_DAEMON_OPTS "additional varnish options here"
 EXPOSE 8080
 ```
 

@@ -18,7 +18,7 @@ if [ "$1" = 'varnishd' ] && [ $# -eq 1 ]; then
 		-F \
 		-a :"${VARNISH_PORT:-6081}" \
 		-f "${VCL_CONFIG:-/usr/local/etc/varnish/default.vcl}" \
-		-s malloc,"${VARNISH_MEMORY:-100m}" \
+		-s malloc,"${VARNISH_MEMORY:-100M}" \
 		${VARNISH_DAEMON_OPTS:-}
 fi
 

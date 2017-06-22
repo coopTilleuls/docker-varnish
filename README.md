@@ -99,7 +99,7 @@ Install VMODs in your Varnish project's Dockerfile. For example, the following D
 ```dockerfile
 FROM tripviss/varnish:5.1
 
-# libvmod-querystring required libpcre available by installing libpcre3-dev
+# libvmod-querystring requires libpcre available by installing libpcre3-dev
 RUN apt-get update
 RUN apt-get install -y -q --no-install-recommends \
     libpcre3-dev

@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y \
 	--no-install-recommends && rm -rf /var/lib/apt/lists/*
 
 ENV VARNISH_VERSION 4.1.6
-ENV VARNISH_FILENAME varnish-4.1.6.tar.gz
+ENV VARNISH_FILENAME varnish-4.1.6.tgz
 ENV VARNISH_SHA256 c7ac460b521bebf772868b2f5aefc2f2508a1e133809cd52d3ba1b312226e849
 
 RUN set -xe \
@@ -49,7 +49,7 @@ RUN set -xe \
 		libpcre3-dev \
 	' \
 	&& apt-get update && apt-get install -y $buildDeps --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-	&& curl -fSL "https://repo.varnish-cache.org/source/$VARNISH_FILENAME" -o "$VARNISH_FILENAME" \
+	&& curl -fSL "https://varnish-cache.org/_downloads/$VARNISH_FILENAME" -o "$VARNISH_FILENAME" \
 	&& echo "$VARNISH_SHA256 *$VARNISH_FILENAME" | sha256sum -c - \
 	&& mkdir -p /usr/local/src/varnish \
 	&& tar -xzf "$VARNISH_FILENAME" -C /usr/local/src/varnish --strip-components=1 \

@@ -51,8 +51,7 @@ RUN apt-get update && apt-get install -y \
 
 ENV VARNISH_VERSION 6.0.0
 ENV VARNISH_FILENAME varnish-6.0.0.tgz
-ENV VARNISH_REPO http://varnish-cache.org/_downloads/
-# Removed SHA256 check as no more available on varnish repo
+ENV VARNISH_SHA256 c7b2839c95b2bf1f336abc20b5d8b149c3aa72deff142f2379d1d431206b0bee
 
 RUN set -xe \
 	&& BUILD_DEPS=' \
@@ -64,7 +63,8 @@ RUN set -xe \
 		libpcre3-dev \
 	' \
 	&& apt-get update && apt-get install -y $BUILD_DEPS --no-install-recommends && rm -rf /var/lib/apt/lists/* \
-	&& curl -fSL "$VARNISH_REPO$VARNISH_FILENAME" -o "$VARNISH_FILENAME" \
+	&& curl -fSL "http://varnish-cache.org/_downloads/$VARNISH_FILENAME" -o "$VARNISH_FILENAME" \
+	&& echo "$VARNISH_SHA256 *$VARNISH_FILENAME" | sha256sum -c - \
 	&& mkdir -p /usr/local/src/varnish \
 	&& tar -xzf "$VARNISH_FILENAME" -C /usr/local/src/varnish --strip-components=1 \
 	&& rm "$VARNISH_FILENAME" \

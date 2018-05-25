@@ -8,7 +8,7 @@ fi
 
 # allow the container to be started with `--user`
 if [ "$1" = 'varnishd' ] && [ "$(id -u)" = '0' ]; then
-	chown -R varnish .
+	chown -R varnish:varnish .
 	exec gosu varnish "$0" "$@"
 fi
 

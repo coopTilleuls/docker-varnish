@@ -94,28 +94,36 @@ $ docker run --name my-running-varnish -e "VARNISH_PORT=80" -d -p 80:80 my-varni
 
 To install Varnish Modules, you will need the Varnish source to compile against. This is why we install Varnish from source in this image rather than using a package manager.
 
-Install VMODs in your Varnish project's Dockerfile. For example, to install the Querystring module:
+Install VMODs in your Varnish project's Dockerfile. For example, the following Dockerfile would install varnish with libvmod-querystring module:
 
 ```dockerfile
 FROM tripviss/varnish:5.1
 
+# libvmod-querystring requires libpcre available by installing libpcre3-dev
+RUN apt-get update
+RUN apt-get install -y -q --no-install-recommends \
+    libpcre3-dev
+
 # Install Querystring Varnish module
-ENV QUERYSTRING_VERSION 1.0.1
-ENV QUERYSTRING_FILENAME libvmod-querystring-1.0.1.tar.gz
+ENV QUERYSTRING_VERSION 1.0.2
+ENV QUERYSTRING_FILENAME libvmod-querystring-1.0.2.tar.gz
 RUN set -xe \
-    && curl -fSL "https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
+    && curl -fSL "https://github.com/Dridi/libvmod-querystring/releases/download/v$QUERYSTRING_VERSION/vmod-querystring-$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
     && mkdir -p /usr/local/src/libvmod-querystring \
     && tar -xzf "$QUERYSTRING_FILENAME" -C /usr/local/src/libvmod-querystring --strip-components=1 \
     && rm "$QUERYSTRING_FILENAME" \
     && cd /usr/local/src/libvmod-querystring \
-    && ./autogen.sh \
-    && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-    && ./configure \
-        --build="$gnuArch" \
-        VARNISHSRC=/usr/local/src/varnish \
-    && make -j "$(nproc)" \
+    && sed -i s/-Werror/-W/ configure \
+    && ./configure --with-rst2man=: \
+    && make \
+    && make check \
     && make install \
     && rm -r /usr/local/src/libvmod-querystring
+
+COPY default.vcl /usr/local/etc/varnish/
+ENV VARNISH_MEMORY 1G
+ENV VARNISH_PORT 1900
+EXPOSE 1900
 ```
 
 # License

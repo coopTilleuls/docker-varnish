@@ -1,7 +1,7 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`5.1.2`, `5.1`, `5`, `latest` (*5.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/5.1/Dockerfile)
-- [`4.1.6`, `4.1`, `4` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
+- [`6.0.0-stretch`, `6.0-stretch`, `6-stretch`, `6.0.0`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/6.0/stretch/Dockerfile)
+- [`4.1.10-stretch`, `4.1-stretch`, `4-stretch`, `4.1.10`, `4.1`, `4` (*4.1/stretch/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/stretch/Dockerfile)
 
 # What is Varnish?
 
@@ -33,7 +33,7 @@ $ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/va
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
 
 ```dockerfile
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
 COPY default.vcl /usr/local/etc/varnish/
 ```
@@ -72,10 +72,10 @@ You can change the path of the VCL configuration file:
 $ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro -d my-varnish
 ```
 
-You can also change the ports used in a Dockerfile.
+You can also change the ports used in a `Dockerfile`.
 
 ```
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
 ENV VARNISH_PORT 8080
 ENV VARNISH_DAEMON_OPTS "additional varnish options here"
@@ -94,50 +94,48 @@ $ docker run --name my-running-varnish -e "VARNISH_PORT=80" -d -p 80:80 my-varni
 
 To install Varnish Modules, you will need the Varnish source to compile against. This is why we install Varnish from source in this image rather than using a package manager.
 
-Install VMODs in your Varnish project's Dockerfile. For example, to install the Querystring module:
+Install VMODs in your Varnish project's `Dockerfile`. For example, to install the Querystring module:
 
 ```dockerfile
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
-# Install Querystring Varnish module
-ENV QUERYSTRING_VERSION 1.0.1
-ENV QUERYSTRING_FILENAME libvmod-querystring-1.0.1.tar.gz
-RUN set -xe \
-    && curl -fSL "https://github.com/Dridi/libvmod-querystring/archive/v$QUERYSTRING_VERSION.tar.gz" -o "$QUERYSTRING_FILENAME" \
-    && mkdir -p /usr/local/src/libvmod-querystring \
-    && tar -xzf "$QUERYSTRING_FILENAME" -C /usr/local/src/libvmod-querystring --strip-components=1 \
-    && rm "$QUERYSTRING_FILENAME" \
-    && cd /usr/local/src/libvmod-querystring \
-    && ./autogen.sh \
-    && gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)" \
-    && ./configure \
+# install vmod-querystring
+ENV VMOD_QUERYSTRING_VERSION 1.0.5
+RUN set -eux; \
+	\
+	fetchDeps=' \
+		ca-certificates \
+		wget \
+	'; \
+	apt-get update; \
+	apt-get install -y --no-install-recommends $fetchDeps; \
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	mkdir -p /usr/local/src; \
+	cd /usr/local/src; \
+	\
+    wget -O vmod-querystring.tar.gz "https://github.com/Dridi/libvmod-querystring/releases/download/v$VMOD_QUERYSTRING_VERSION/vmod-querystring-$VMOD_QUERYSTRING_VERSION.tar.gz"; \
+    mkdir -p /usr/local/src/vmod-querystring; \
+    tar -zxf /usr/local/src/vmod-querystring.tar.gz -C /usr/local/src/vmod-querystring --strip-components=1; \
+    cd /usr/local/src/vmod-querystring; \
+	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+    ./configure \
         --build="$gnuArch" \
-        VARNISHSRC=/usr/local/src/varnish \
-    && make -j "$(nproc)" \
-    && make install \
-    && rm -r /usr/local/src/libvmod-querystring
+        VARNISHSRC=/usr/src/varnish \
+	; \
+    make -j "$(nproc)"; \
+    make install; \
+    make clean; \
+    cd /; \
+    rm -rf /usr/local/src/vmod-querystring /usr/local/src/vmod-querystring.tar.gz; \
+	\
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
 ```
 
 # License
 
 View [license information](https://github.com/varnishcache/varnish-cache/blob/master/LICENSE) for the software contained in this image.
 
-# Supported Docker versions
+As with all Docker images, these likely also contain other software which may be under other licenses (such as Bash, etc from the base distribution, along with any direct or indirect dependencies of the primary software being contained).
 
-This image is supported on Docker version 1.12.3.
-
-Support for older versions (down to 1.6) is provided on a best-effort basis.
-
-Please see [the Docker installation documentation](https://docs.docker.com/installation/) for details on how to upgrade your Docker daemon.
-
-# User Feedback
-
-## Issues
-
-If you have any problems with or questions about this image, please contact us through a [GitHub issue](https://github.com/tripviss/docker-varnish/issues).
-
-## Contributing
-
-You are invited to contribute new features, fixes, or updates, large or small; we are always thrilled to receive pull requests, and do our best to process them as fast as we can.
-
-Before you start to code, we recommend discussing your plans through a [GitHub issue](https://github.com/tripviss/docker-varnish/issues), especially for more ambitious contributions. This gives other contributors a chance to point you in the right direction, give you feedback on your design, and help you find out if someone else is working on the same thing.
+As for any pre-built image usage, it is the image user's responsibility to ensure that any use of this image complies with any relevant licenses for all software contained within.

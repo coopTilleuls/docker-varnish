@@ -1,6 +1,8 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`5.1.2`, `5.1`, `5`, `latest` (*5.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/5.1/Dockerfile)
+- [`6.0`, `6`, `latest`
+(*6.0/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/6.0/Dockerfile)
+- [`5.1.2`, `5.1`, `5` (*5.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/5.1/Dockerfile)
 - [`4.1.6`, `4.1`, `4` (*4.1/Dockerfile*)](https://github.com/tripviss/docker-varnish/blob/master/4.1/Dockerfile)
 
 # What is Varnish?
@@ -33,7 +35,7 @@ $ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/va
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
 
 ```dockerfile
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
 COPY default.vcl /usr/local/etc/varnish/
 ```
@@ -75,7 +77,7 @@ $ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /pat
 You can also change the ports used in a Dockerfile.
 
 ```
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
 ENV VARNISH_PORT 8080
 ENV VARNISH_DAEMON_OPTS "additional varnish options here"
@@ -97,7 +99,7 @@ To install Varnish Modules, you will need the Varnish source to compile against.
 Install VMODs in your Varnish project's Dockerfile. For example, to install the Querystring module:
 
 ```dockerfile
-FROM tripviss/varnish:5.1
+FROM tripviss/varnish:6.0
 
 # Install Querystring Varnish module
 ENV QUERYSTRING_VERSION 1.0.1

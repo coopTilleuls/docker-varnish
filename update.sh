@@ -47,29 +47,29 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for suite in stretch alpine{3.7}; do
-		[ -d "$version/$suite" ] || continue
-		alpineVer="${suite#alpine}"
+	for variant in stretch alpine{3.7}; do
+		[ -d "$version/$variant" ] || continue
+		alpineVer="${variant#alpine}"
 
 		baseDockerfile=Dockerfile-debian.template
-		if [ "${suite#alpine}" != "$suite" ]; then
+		if [ "${variant#alpine}" != "$variant" ]; then
 			baseDockerfile=Dockerfile-alpine.template
 		fi
 
-		{ generated_warning; cat "$baseDockerfile"; } > "$version/$suite/Dockerfile"
+		{ generated_warning; cat "$baseDockerfile"; } > "$version/$variant/Dockerfile"
 
-		echo "Generating $version/$suite/Dockerfile from $baseDockerfile"
+		echo "Generating $version/$variant/Dockerfile from $baseDockerfile"
 
 		cp -a \
 			docker-varnish-entrypoint \
 			docker-varnish-source \
-			"$version/$suite/"
+			"$version/$variant/"
 
 		sed -ri \
-			-e 's!%%DEBIAN_SUITE%%!'"$suite"'-slim!' \
+			-e 's!%%DEBIAN_SUITE%%!'"$variant"'-slim!' \
 			-e 's!%%ALPINE_VERSION%%!'"$alpineVer"'!' \
-			"$version/$suite/Dockerfile"
-		dockerfiles+=( "$version/$suite/Dockerfile" )
+			"$version/$variant/Dockerfile"
+		dockerfiles+=( "$version/$variant/Dockerfile" )
 	done
 
 	(

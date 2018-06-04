@@ -9,14 +9,13 @@ fi
 # allow the container to be started with `--user`
 if [ "$1" = 'varnishd' ] && [ "$(id -u)" = '0' ]; then
 	chown -R varnish:varnish .
-	exec gosu varnish "$0" "$@"
 fi
 
 # default args
 if [ "$1" = 'varnishd' ] && [ $# -eq 1 ]; then
 	set -- varnishd \
 		-F \
-		-a :"${VARNISH_PORT:-6081}" \
+		-a :"${VARNISH_PORT:-80}" \
 		-f "${VARNISH_VCL:-/usr/local/etc/varnish/default.vcl}" \
 		-s malloc,"${VARNISH_MEMORY:-100M}" \
 		${VARNISH_DAEMON_OPTS:-}

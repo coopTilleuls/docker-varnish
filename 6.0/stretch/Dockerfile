@@ -7,7 +7,11 @@
 FROM debian:stretch-slim
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
-RUN groupadd -r varnish && useradd -r -g varnish varnish
+RUN set -eux; \
+	groupadd -r varnish; \
+	for user in varnish vcache; do \
+		useradd -r -g varnish $user; \
+	done
 
 # prevent Debian's Varnish packages from being installed
 RUN set -eux; \
@@ -16,40 +20,6 @@ RUN set -eux; \
 		echo 'Pin: release *'; \
 		echo 'Pin-Priority: -1'; \
 } > /etc/apt/preferences.d/no-debian-varnish
-
-# grab gosu for easy step-down from root
-ENV GOSU_VERSION 1.10
-RUN set -eux; \
-	\
-	fetchDeps=' \
-		ca-certificates \
-		wget \
-	'; \
-	if ! command -v gpg > /dev/null; then \
-		fetchDeps="$fetchDeps \
-			dirmngr \
-			gnupg \
-		"; \
-	fi; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	dpkgArch="$(dpkg --print-architecture | awk -F- '{ print $NF }')"; \
-	wget -O /usr/local/bin/gosu "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch"; \
-	wget -O /usr/local/bin/gosu.asc "https://github.com/tianon/gosu/releases/download/$GOSU_VERSION/gosu-$dpkgArch.asc"; \
-	\
-# verify the signature
-	export GNUPGHOME="$(mktemp -d)"; \
-	gpg --keyserver ha.pool.sks-keyservers.net --recv-keys B42F6819007F00F88E364FD4036A9C25BF357DD4; \
-	gpg --batch --verify /usr/local/bin/gosu.asc /usr/local/bin/gosu; \
-	rm -rf "$GNUPGHOME" /usr/local/bin/gosu.asc; \
-	\
-	chmod +x /usr/local/bin/gosu; \
-# verify that the binary works
-	gosu nobody true; \
-	\
-	apt-get purge -y --auto-remove $fetchDeps
 
 # dependencies required for building VMOD (Varnish modules)
 # (see persistent deps below)
@@ -150,5 +120,5 @@ VOLUME /usr/local/var/varnish
 COPY docker-varnish-entrypoint /usr/local/bin/
 ENTRYPOINT ["docker-varnish-entrypoint"]
 
-EXPOSE 6081
+EXPOSE 80
 CMD ["varnishd"]

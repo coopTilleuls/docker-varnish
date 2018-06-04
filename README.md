@@ -47,7 +47,7 @@ $ docker run --name my-running-varnish -d my-varnish
 ### Exposing the port
 
 ```console
-$ docker run --name my-running-varnish -d -p 8080:6081 my-varnish
+$ docker run --name my-running-varnish -d -p 8080:80 my-varnish
 ```
 
 Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
@@ -85,7 +85,7 @@ EXPOSE 8080
 Or with a command:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_PORT=80" -d -p 80:80 my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_PORT=8080" -d -p 8080:8080 my-varnish
 ```
 
 # How to install VMODs (Varnish Modules)

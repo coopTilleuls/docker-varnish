@@ -77,7 +77,7 @@ You can also change the ports used in a `Dockerfile`.
 ```
 FROM cooptilleuls/varnish:6.0
 
-ENV VARNISH_PORT 8080
+ENV VARNISH_LISTEN 8080
 ENV VARNISH_DAEMON_OPTS "additional varnish options here"
 EXPOSE 8080
 ```
@@ -85,7 +85,7 @@ EXPOSE 8080
 Or with a command:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_PORT=8080" -d -p 8080:8080 my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_LISTEN=8080" -d -p 8080:8080 my-varnish
 ```
 
 # How to install VMODs (Varnish Modules)

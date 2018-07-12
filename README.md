@@ -27,7 +27,7 @@ backend default {
 Then run:
 
 ```console
-$ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/varnish/default.vcl:ro -d cooptilleuls/varnish
+$ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/varnish/default.vcl:ro --tmpfs /usr/local/var/varnish:exec -d cooptilleuls/varnish
 ```
 
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
@@ -41,13 +41,13 @@ COPY default.vcl /usr/local/etc/varnish/
 Place this file in the same directory as your `default.vcl`, run `docker build -t my-varnish .`, then start your container:
 
 ```console
-$ docker run --name my-running-varnish -d my-varnish
+$ docker run --name my-running-varnish --tmpfs /usr/local/var/varnish:exec -d my-varnish
 ```
 
 ### Exposing the port
 
 ```console
-$ docker run --name my-running-varnish -d -p 8080:80 my-varnish
+$ docker run --name my-running-varnish --tmpfs /usr/local/var/varnish:exec -d -p 8080:80 my-varnish
 ```
 
 Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
@@ -57,19 +57,19 @@ Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browse
 You can override the size of the cache:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_MEMORY=1G" -d my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_MEMORY=1G" --tmpfs /usr/local/var/varnish:exec -d my-varnish
 ```
 
 You can pass additional parameters to the `varnishd` process:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_DAEMON_OPTS=-t 3600 -p http_req_hdr_len=16384 -p http_resp_hdr_len=16384" -d my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_DAEMON_OPTS=-t 3600 -p http_req_hdr_len=16384 -p http_resp_hdr_len=16384" --tmpfs /usr/local/var/varnish:exec -d my-varnish
 ```
 
 You can change the path of the VCL configuration file:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro -d my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro --tmpfs /usr/local/var/varnish:exec -d my-varnish
 ```
 
 You can also change the ports used in a `Dockerfile`.
@@ -85,7 +85,7 @@ EXPOSE 8080
 Or with a command:
 
 ```console
-$ docker run --name my-running-varnish -e "VARNISH_LISTEN=8080" -d -p 8080:8080 my-varnish
+$ docker run --name my-running-varnish -e "VARNISH_LISTEN=8080" --tmpfs /usr/local/var/varnish:exec -d -p 8080:8080 my-varnish
 ```
 
 # How to install VMODs (Varnish Modules)

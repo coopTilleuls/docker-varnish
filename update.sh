@@ -62,7 +62,6 @@ for version in "${versions[@]}"; do
 
 		cp -a \
 			docker-varnish-entrypoint \
-			docker-varnish-source \
 			"$version/$variant/"
 
 		sed -ri \

@@ -102,34 +102,32 @@ FROM cooptilleuls/varnish:6.0
 # install vmod-querystring
 ENV VMOD_QUERYSTRING_VERSION 1.0.5
 RUN set -eux; \
-	\
-	fetchDeps=' \
-		ca-certificates \
-		wget \
-	'; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	mkdir -p /usr/local/src; \
-	cd /usr/local/src; \
-	\
+    \
+    fetchDeps=' \
+        ca-certificates \
+        wget \
+    '; \
+    apt-get update; \
+    apt-get install -y --no-install-recommends $fetchDeps; \
+    rm -rf /var/lib/apt/lists/*; \
+    \
     wget -O vmod-querystring.tar.gz "https://github.com/Dridi/libvmod-querystring/releases/download/v$VMOD_QUERYSTRING_VERSION/vmod-querystring-$VMOD_QUERYSTRING_VERSION.tar.gz"; \
     mkdir -p /usr/local/src/vmod-querystring; \
-    tar -zxf /usr/local/src/vmod-querystring.tar.gz -C /usr/local/src/vmod-querystring --strip-components=1; \
+    tar -zxf vmod-querystring.tar.gz -C /usr/local/src/vmod-querystring --strip-components=1; \
+    rm vmod-querystring.tar.gz; \
+    \
     cd /usr/local/src/vmod-querystring; \
-	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
+    gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
     ./configure \
         --build="$gnuArch" \
-        VARNISHSRC=/usr/src/varnish \
-	; \
+    ; \
     make -j "$(nproc)"; \
     make install; \
-    make clean; \
+    \
     cd /; \
-    rm -rf /usr/local/src/vmod-querystring /usr/local/src/vmod-querystring.tar.gz; \
-	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
+    rm -rf /usr/local/src/vmod-querystring; \
+    \
+    apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
 ```
 
 # License

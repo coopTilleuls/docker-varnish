@@ -55,12 +55,16 @@ RUN set -eux; \
 		ca-certificates \
 		wget \
 	'; \
+	buildDeps=' \
+		libedit-dev \
+		libjemalloc-dev \
+		libncurses-dev \
+		libpcre3-dev \
+	'; \
+	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
+	apt-get install -y --no-install-recommends $fetchDeps $buildDeps; \
 	rm -rf /var/lib/apt/lists/*; \
-	\
-	mkdir -p /usr/src; \
-	cd /usr/src; \
 	\
 	wget -O varnish.tar.gz "$VARNISH_URL"; \
 	\
@@ -68,23 +72,10 @@ RUN set -eux; \
 		echo "$VARNISH_SHA256 *varnish.tar.gz" | sha256sum -c -; \
 	fi; \
 	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
-
-COPY docker-varnish-source /usr/local/bin/
-
-RUN set -eux; \
+	mkdir -p /usr/src/varnish; \
+	tar -zxf varnish.tar.gz -C /usr/src/varnish --strip-components=1; \
+	rm varnish.tar.gz; \
 	\
-	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends \
-		libedit-dev \
-		libjemalloc-dev \
-		libncurses-dev \
-		libpcre3-dev \
-	; \
-	rm -rf /var/lib/apt/lists/*; \
-	\
-	docker-varnish-source extract; \
 	cd /usr/src/varnish; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./autogen.sh; \
@@ -94,9 +85,9 @@ RUN set -eux; \
 	make -j "$(nproc)"; \
 	make install; \
 	ldconfig; \
-	make clean; \
+	\
 	cd /; \
-	docker-varnish-source delete; \
+	rm -r /usr/src/varnish; \
 	\
 # reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
 	apt-mark auto '.*' > /dev/null; \

@@ -37,8 +37,6 @@ ENV VMOD_BUILD_DEPS \
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \
 		$VMOD_BUILD_DEPS \
-		ca-certificates \
-		curl \
 		libedit2 \
 		libjemalloc1 \
 		libncurses5 \

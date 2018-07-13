@@ -1,7 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`6.0.0-stretch`, `6.0-stretch`, `6-stretch`, `6.0.0`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
+- [`6.0.0-stretch`, `6.0-stretch`, `6-stretch`, `stretch`, `6.0.0`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
+- [`6.0.0-alpine3.8`, `6.0-alpine3.8`, `6-alpine3.8`, `alpine3.8`, `6.0.0-alpine`, `6.0-alpine`, `6-alpine`, `alpine` (*6.0/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/alpine3.8/Dockerfile)
 - [`4.1.10-stretch`, `4.1-stretch`, `4-stretch`, `4.1.10`, `4.1`, `4` (*4.1/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/stretch/Dockerfile)
+- [`4.1.10-alpine3.8`, `4.1-alpine3.8`, `4-alpine3.8`, `4.1.10-alpine`, `4.1-alpine`, `4-alpine` (*4.1/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/alpine3.8/Dockerfile)
 
 # What is Varnish?
 
@@ -107,8 +109,12 @@ RUN set -eux; \
 		ca-certificates \
 		wget \
 	'; \
+	buildDeps=" \
+		$VMOD_BUILD_DEPS \
+		dpkg-dev \
+	"; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps; \
+	apt-get install -y --no-install-recommends $fetchDeps $buildDeps; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
 	wget -O vmod-querystring.tar.gz "https://github.com/Dridi/libvmod-querystring/releases/download/v$VMOD_QUERYSTRING_VERSION/vmod-querystring-$VMOD_QUERYSTRING_VERSION.tar.gz"; \
@@ -127,7 +133,7 @@ RUN set -eux; \
 	cd /; \
 	rm -rf /usr/local/src/vmod-querystring; \
 	\
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps $buildDeps
 ```
 
 # License

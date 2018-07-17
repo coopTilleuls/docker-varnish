@@ -7,7 +7,7 @@ declare -A aliases=(
 )
 
 defaultDebianSuite='stretch'
-defaultAlpineVersion='3.7'
+defaultAlpineVersion='3.8'
 
 self="$(basename "$BASH_SOURCE")"
 cd "$(dirname "$(readlink -f "$BASH_SOURCE")")"
@@ -79,7 +79,7 @@ for version in "${versions[@]}"; do
 	# order here controls the order of the library/ file
 	for variant in \
 		stretch \
-		alpine{3.7} \
+		alpine3.8 \
 	; do
 		dir="$version/$variant"
 		[ -f "$dir/Dockerfile" ] || continue
@@ -93,8 +93,9 @@ for version in "${versions[@]}"; do
 
 		variantAliases+=( "${baseAliases[@]}" )
 
-		if [ "${variant#alpine}" = "$defaultAlpineVersion" ] ; then
+		if [ "${variant#alpine}" = "$defaultAlpineVersion" ]; then
 			variantAliases=( "${variantAliases[@]/%/-alpine}" )
+			variantAliases=( "${variantAliases[@]/%${variant}-alpine/$variant}" )
 		elif [ "$variant" != "$defaultDebianSuite" ]; then
 			variantAliases=()
 		fi

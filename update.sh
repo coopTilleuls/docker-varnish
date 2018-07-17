@@ -47,7 +47,7 @@ for version in "${versions[@]}"; do
 
 	dockerfiles=()
 
-	for variant in stretch alpine{3.7}; do
+	for variant in stretch alpine3.8; do
 		[ -d "$version/$variant" ] || continue
 		alpineVer="${variant#alpine}"
 

@@ -4,46 +4,36 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
-FROM debian:stretch-slim
+FROM alpine:3.8
 
 # add our user and group first to make sure their IDs get assigned consistently, regardless of whatever dependencies get added
 RUN set -eux; \
-	groupadd -r varnish; \
+	addgroup -S varnish; \
 	for user in varnish vcache; do \
-		useradd -r -g varnish $user; \
+		adduser -S -G varnish $user; \
 	done
-
-# prevent Debian's Varnish packages from being installed
-RUN set -eux; \
-	{ \
-		echo 'Package: varnish*'; \
-		echo 'Pin: release *'; \
-		echo 'Pin-Priority: -1'; \
-} > /etc/apt/preferences.d/no-debian-varnish
 
 # dependencies required for building VMOD (Varnish modules)
 ENV VMOD_BUILD_DEPS \
-		autoconf-archive \
+		autoconf \
+		# autoconf-archive \
 		automake \
-		autotools-dev \
 		libtool \
 		make \
-		pkg-config \
-		python-docutils
+		pkgconf \
+		py-docutils
 
 # persistent / runtime deps
-RUN apt-get update && apt-get install -y \
+RUN apk add --no-cache --virtual .persistent-deps \
 		gcc \
-		libc6-dev \
-		libedit2 \
-		libjemalloc1 \
-		libncurses5 \
-		libpcre3 \
---no-install-recommends && rm -r /var/lib/apt/lists/*
+		libc-dev \
+		libgcc
 
 ENV VARNISH_VERSION 4.1.10
 ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-4.1.10.tgz
 ENV VARNISH_SHA256 364833fbf6fb7540ddd54b62b5ac52b2fb00e915049c8446d71d334323e87c22
+
+COPY *.patch /varnish-alpine-patches/
 
 RUN set -eux; \
 	\
@@ -53,17 +43,18 @@ RUN set -eux; \
 	'; \
 	buildDeps=" \
 		$VMOD_BUILD_DEPS \
+		coreutils \
+		dpkg \
 		dpkg-dev \
 		libedit-dev \
-		libjemalloc-dev \
-		libncurses5-dev \
-		libpcre3-dev \
-		python-sphinx \
+		libexecinfo-dev \
+		linux-headers \
+		ncurses-dev \
+		patch \
+		pcre-dev \
+		py-sphinx \
 	"; \
-	savedAptMark="$(apt-mark showmanual)"; \
-	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps $buildDeps; \
-	rm -rf /var/lib/apt/lists/*; \
+	apk add --no-cache --virtual .build-deps $fetchDeps $buildDeps; \
 	\
 	wget -O varnish.tar.gz "$VARNISH_URL"; \
 	\
@@ -76,30 +67,31 @@ RUN set -eux; \
 	rm varnish.tar.gz; \
 	\
 	cd /usr/src/varnish; \
+	for p in /varnish-alpine-patches/*.patch; do \
+		[ -f "$p" ] || continue; \
+		patch -p1 -i "$p"; \
+	done; \
 	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
 	./autogen.sh; \
 	./configure \
 		--build="$gnuArch" \
+		--without-jemalloc \
 	; \
 	make -j "$(nproc)"; \
 	make install; \
-	ldconfig; \
 	\
 	cd /; \
 	rm -r /usr/src/varnish; \
 	\
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
-	find /usr/local -type f -executable -exec ldd '{}' ';' \
-		| awk '/=>/ { print $(NF-1) }' \
-		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -r apt-mark manual \
-	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
+	runDeps="$( \
+		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
+			| tr ',' '\n' \
+			| sort -u \
+			| awk 'system("[ -e /usr/local/lib/**/"$1" ]") == 0 { next } { print "so:" $1 }' \
+	)"; \
+	apk add --no-cache --virtual .varnish-rundeps $runDeps; \
+	\
+	apk del .build-deps; \
 	\
 	varnishd -V
 

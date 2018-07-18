@@ -7,7 +7,7 @@
 
 # What is Varnish?
 
-[Varnish Cache](https://www.varnish-cache.org/) is a web application accelerator also known as a caching HTTP reverse proxy. You install it in front of any server that speaks HTTP and configure it to cache the contents. Varnish Cache is really, really fast. It typically speeds up delivery with a factor of 300 - 1000x, depending on your architecture.
+Varnish is an HTTP accelerator designed for content-heavy dynamic web sites as well as APIs. In contrast to other web accelerators, such as Squid, which began life as a client-side cache, or Apache and nginx, which are primarily origin servers, Varnish was designed as an HTTP accelerator. Varnish is focused exclusively on HTTP, unlike other proxy servers that often support FTP, SMTP and other network protocols.
 
 > [wikipedia.org/wiki/Varnish_(software)](https://en.wikipedia.org/wiki/Varnish_(software))
 
@@ -92,11 +92,9 @@ $ docker run --name my-running-varnish -e "VARNISH_LISTEN=:8080" --tmpfs /usr/lo
 
 # How to install VMODs (Varnish Modules)
 
-[Varnish Modules](https://www.varnish-cache.org/vmods) are extensions written for Varnish Cache.
+[VMODs](https://varnish-cache.org/vmods/) are extensions written for Varnish Cache.
 
-To install Varnish Modules, you will need the Varnish source to compile against. This is why we install Varnish from source in this image rather than using a package manager.
-
-Install VMODs in your Varnish project's `Dockerfile`. For example, to install the Querystring module:
+Install VMODs in your Varnish project's `Dockerfile`. For example, to install the [vmod-querystring](https://github.com/Dridi/libvmod-querystring) module:
 
 ```dockerfile
 FROM cooptilleuls/varnish:6.0

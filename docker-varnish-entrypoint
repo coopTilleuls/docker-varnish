@@ -15,7 +15,7 @@ fi
 if [ "$1" = 'varnishd' ] && [ $# -eq 1 ]; then
 	set -- varnishd \
 		-F \
-		-a :"${VARNISH_LISTEN:-80}" \
+		-a "${VARNISH_LISTEN:-:80}" \
 		-f "${VARNISH_VCL:-/usr/local/etc/varnish/default.vcl}" \
 		-s malloc,"${VARNISH_MEMORY:-100M}" \
 		${VARNISH_DAEMON_OPTS:-}

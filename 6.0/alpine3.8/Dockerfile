@@ -87,7 +87,7 @@ RUN set -eux; \
 		scanelf --needed --nobanner --format '%n#p' --recursive /usr/local \
 			| tr ',' '\n' \
 			| sort -u \
-			| awk 'system("[ -e /usr/local/lib/**/"$1" ]") == 0 { next } { print "so:" $1 }' \
+			| awk 'system("[ -e /usr/local/lib/" $1 " ] || [ -e /usr/local/lib/varnish/" $1 " ]") == 0 { next } { print "so:" $1 }' \
 	)"; \
 	apk add --no-cache --virtual .varnish-rundeps $runDeps; \
 	\

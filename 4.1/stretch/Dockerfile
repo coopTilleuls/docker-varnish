@@ -19,7 +19,7 @@ RUN set -eux; \
 		echo 'Package: varnish*'; \
 		echo 'Pin: release *'; \
 		echo 'Pin-Priority: -1'; \
-} > /etc/apt/preferences.d/no-debian-varnish
+	} > /etc/apt/preferences.d/no-debian-varnish
 
 # dependencies required for building VMOD (Varnish modules)
 ENV VMOD_BUILD_DEPS \
@@ -35,11 +35,7 @@ ENV VMOD_BUILD_DEPS \
 RUN apt-get update && apt-get install -y \
 		gcc \
 		libc6-dev \
-		libedit2 \
-		libjemalloc1 \
-		libncurses5 \
-		libpcre3 \
---no-install-recommends && rm -r /var/lib/apt/lists/*
+	--no-install-recommends && rm -r /var/lib/apt/lists/*
 
 ENV VARNISH_VERSION 4.1.10
 ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-4.1.10.tgz

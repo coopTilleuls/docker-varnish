@@ -11,14 +11,4 @@ if [ "$1" = 'varnishd' ] && [ "$(id -u)" = '0' ]; then
 	chown -R varnish:varnish .
 fi
 
-# default args
-if [ "$1" = 'varnishd' ] && [ $# -eq 1 ]; then
-	set -- varnishd \
-		-F \
-		-a "${VARNISH_LISTEN:-:80}" \
-		-f "${VARNISH_VCL:-/usr/local/etc/varnish/default.vcl}" \
-		-s malloc,"${VARNISH_MEMORY:-100M}" \
-		${VARNISH_DAEMON_OPTS:-}
-fi
-
 exec "$@"

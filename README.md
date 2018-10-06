@@ -54,42 +54,6 @@ $ docker run --name my-running-varnish --tmpfs /usr/local/var/varnish:exec -d -p
 
 Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browser.
 
-## Advanced configuration using environment variables
-
-You can override the size of the cache:
-
-```console
-$ docker run --name my-running-varnish -e "VARNISH_MEMORY=1G" --tmpfs /usr/local/var/varnish:exec -d my-varnish
-```
-
-You can pass additional parameters to the `varnishd` process:
-
-```console
-$ docker run --name my-running-varnish -e "VARNISH_DAEMON_OPTS=-t 3600 -p http_req_hdr_len=16384 -p http_resp_hdr_len=16384" --tmpfs /usr/local/var/varnish:exec -d my-varnish
-```
-
-You can change the path of the VCL configuration file:
-
-```console
-$ docker run --name my-running-varnish -e "VARNISH_VCL=/root/custom.vcl" -v /path/to/custom.vcl:/root/custom.vcl:ro --tmpfs /usr/local/var/varnish:exec -d my-varnish
-```
-
-You can also change the ports used in a `Dockerfile`.
-
-```
-FROM cooptilleuls/varnish:6.0
-
-ENV VARNISH_LISTEN :8080
-ENV VARNISH_DAEMON_OPTS "additional varnish options here"
-EXPOSE 8080
-```
-
-Or with a command:
-
-```console
-$ docker run --name my-running-varnish -e "VARNISH_LISTEN=:8080" --tmpfs /usr/local/var/varnish:exec -d -p 8080:8080 my-varnish
-```
-
 # How to install VMODs (Varnish Modules)
 
 [VMODs](https://varnish-cache.org/vmods/) are extensions written for Varnish Cache.

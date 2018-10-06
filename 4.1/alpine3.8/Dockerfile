@@ -103,4 +103,4 @@ COPY docker-varnish-entrypoint /usr/local/bin/
 ENTRYPOINT ["docker-varnish-entrypoint"]
 
 EXPOSE 80
-CMD ["varnishd"]
+CMD ["varnishd", "-F", "-f", "/usr/local/etc/varnish/default.vcl"]

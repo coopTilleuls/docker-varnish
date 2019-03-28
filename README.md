@@ -1,9 +1,9 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`6.0.0-stretch`, `6.0-stretch`, `6-stretch`, `stretch`, `6.0.0`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
-- [`6.0.0-alpine3.8`, `6.0-alpine3.8`, `6-alpine3.8`, `alpine3.8`, `6.0.0-alpine`, `6.0-alpine`, `6-alpine`, `alpine` (*6.0/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/alpine3.8/Dockerfile)
-- [`4.1.10-stretch`, `4.1-stretch`, `4-stretch`, `4.1.10`, `4.1`, `4` (*4.1/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/stretch/Dockerfile)
-- [`4.1.10-alpine3.8`, `4.1-alpine3.8`, `4-alpine3.8`, `4.1.10-alpine`, `4.1-alpine`, `4-alpine` (*4.1/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/alpine3.8/Dockerfile)
+- [`6.0.3-stretch`, `6.0-stretch`, `6-stretch`, `stretch`, `6.0.3`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
+- [`6.0.3-alpine3.8`, `6.0-alpine3.8`, `6-alpine3.8`, `alpine3.8`, `6.0.3-alpine`, `6.0-alpine`, `6-alpine`, `alpine` (*6.0/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/alpine3.8/Dockerfile)
+- [`4.1.11-stretch`, `4.1-stretch`, `4-stretch`, `4.1.11`, `4.1`, `4` (*4.1/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/stretch/Dockerfile)
+- [`4.1.11-alpine3.8`, `4.1-alpine3.8`, `4-alpine3.8`, `4.1.11-alpine`, `4.1-alpine`, `4-alpine` (*4.1/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/alpine3.8/Dockerfile)
 
 # What is Varnish?
 

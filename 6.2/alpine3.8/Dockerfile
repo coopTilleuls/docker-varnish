@@ -75,8 +75,8 @@ RUN set -eux; \
 	./configure \
 		--build="$gnuArch" \
 		--without-jemalloc \
-		--with-rst2man=false \
-		--with-sphinx-build=false \
+		--with-rst2man=$(command -v true) \
+		--with-sphinx-build=$(command -v true) \
 	; \
 	make -j "$(nproc)"; \
 	make install; \

@@ -23,7 +23,7 @@ ENV VMOD_BUILD_DEPS \
 		libtool \
 		make \
 		pkg-config \
-		python-docutils
+		python3
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \
@@ -48,7 +48,6 @@ RUN set -eux; \
 		libjemalloc-dev \
 		libncurses5-dev \
 		libpcre3-dev \
-		python-sphinx \
 	"; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \
@@ -70,6 +69,8 @@ RUN set -eux; \
 	./autogen.sh; \
 	./configure \
 		--build="$gnuArch" \
+		--with-rst2man=$(command -v true) \
+		--with-sphinx-build=$(command -v true) \
 	; \
 	make -j "$(nproc)"; \
 	make install; \

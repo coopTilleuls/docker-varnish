@@ -1,9 +1,11 @@
 # Supported tags and respective `Dockerfile` links
 
-- [`6.0.3-stretch`, `6.0-stretch`, `6-stretch`, `stretch`, `6.0.3`, `6.0`, `6`, `latest` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
-- [`6.0.3-alpine3.8`, `6.0-alpine3.8`, `6-alpine3.8`, `alpine3.8`, `6.0.3-alpine`, `6.0-alpine`, `6-alpine`, `alpine` (*6.0/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/alpine3.8/Dockerfile)
-- [`4.1.11-stretch`, `4.1-stretch`, `4-stretch`, `4.1.11`, `4.1`, `4` (*4.1/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/stretch/Dockerfile)
-- [`4.1.11-alpine3.8`, `4.1-alpine3.8`, `4-alpine3.8`, `4.1.11-alpine`, `4.1-alpine`, `4-alpine` (*4.1/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/alpine3.8/Dockerfile)
+- [`6.2.0-stretch`, `6.2-stretch`, `6-stretch`, `stretch`, `6.2.0`, `6.2`, `6`, `latest` (*6.2/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.2/stretch/Dockerfile)
+- [`6.2.0-alpine3.8`, `6.2-alpine3.8`, `6-alpine3.8`, `alpine3.8`, `6.2.0-alpine`, `6.2-alpine`, `6-alpine`, `alpine` (*6.2/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.2/alpine3.8/Dockerfile)
+- [`6.0.3-stretch`, `6.0-stretch`, `6-lts-stretch`, `lts-stretch`, `6.0.3`, `6.0`, `6-lts`, `lts` (*6.0/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/stretch/Dockerfile)
+- [`6.0.3-alpine3.8`, `6.0-alpine3.8`, `6-lts-alpine3.8`, `lts-alpine3.8`, `6.0.3-alpine`, `6.0-alpine`, `6-lts-alpine`, `lts-alpine` (*6.0/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/6.0/alpine3.8/Dockerfile)
+- [`4.1.11-stretch`, `4.1-stretch`, `4-stretch`, `4-lts-stretch`, `4.1.11`, `4.1`, `4`, `4-lts` (*4.1/stretch/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/stretch/Dockerfile)
+- [`4.1.11-alpine3.8`, `4.1-alpine3.8`, `4-alpine3.8`, `4-lts-alpine3.8`, `4.1.11-alpine`, `4.1-alpine`, `4-alpine`, `4-lts-alpine` (*4.1/alpine3.8/Dockerfile*)](https://github.com/coopTilleuls/docker-varnish/blob/master/4.1/alpine3.8/Dockerfile)
 
 # What is Varnish?
 
@@ -35,7 +37,7 @@ $ docker run --name my-running-varnish -v /path/to/default.vcl:/usr/local/etc/va
 Alternatively, a simple `Dockerfile` can be used to generate a new image that includes the necessary `default.vcl` (which is a much cleaner solution than the bind mount above):
 
 ```dockerfile
-FROM cooptilleuls/varnish:6.0
+FROM cooptilleuls/varnish:6.2
 
 COPY default.vcl /usr/local/etc/varnish/
 ```
@@ -61,7 +63,7 @@ Then you can hit `http://localhost:8080` or `http://host-ip:8080` in your browse
 Install VMODs in your Varnish project's `Dockerfile`. For example, to install the [vmod-querystring](https://github.com/Dridi/libvmod-querystring) module:
 
 ```dockerfile
-FROM cooptilleuls/varnish:6.0
+FROM cooptilleuls/varnish:6.2
 
 # install vmod-querystring
 ENV VMOD_QUERYSTRING_VERSION 1.0.5

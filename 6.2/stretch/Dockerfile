@@ -37,9 +37,9 @@ RUN apt-get update && apt-get install -y \
 		libc6-dev \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
 
-ENV VARNISH_VERSION 4.1.11
-ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-4.1.11.tgz
-ENV VARNISH_SHA256 f937a45116f3a7fbb38b2b5d7137658a4846409630bb9eccdbbb240e1a1379bc
+ENV VARNISH_VERSION 6.2.0
+ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-6.2.0.tgz
+ENV VARNISH_SHA256 c37af353aca25a83d22f9c5ce0ae800fe433e4d02e1457e02886a5849f988e53
 
 RUN set -eux; \
 	\

@@ -21,7 +21,7 @@ ENV VMOD_BUILD_DEPS \
 		libtool \
 		make \
 		pkgconf \
-		py-docutils
+		py3-docutils
 
 # persistent / runtime deps
 RUN apk add --no-cache --virtual .persistent-deps \
@@ -52,7 +52,7 @@ RUN set -eux; \
 		ncurses-dev \
 		patch \
 		pcre-dev \
-		py-sphinx \
+		py3-sphinx \
 	"; \
 	apk add --no-cache --virtual .build-deps $fetchDeps $buildDeps; \
 	\

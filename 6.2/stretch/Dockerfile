@@ -29,7 +29,7 @@ ENV VMOD_BUILD_DEPS \
 		libtool \
 		make \
 		pkg-config \
-		python-docutils
+		python3-docutils
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \
@@ -54,7 +54,7 @@ RUN set -eux; \
 		libjemalloc-dev \
 		libncurses5-dev \
 		libpcre3-dev \
-		python-sphinx \
+		python3-sphinx \
 	"; \
 	savedAptMark="$(apt-mark showmanual)"; \
 	apt-get update; \

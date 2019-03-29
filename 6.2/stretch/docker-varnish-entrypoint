@@ -1,0 +1,14 @@
+#!/bin/sh
+set -e
+
+# first arg is `-f` or `--some-option`
+if [ "${1#-}" != "$1" ]; then
+	set -- varnishd "$@"
+fi
+
+# allow the container to be started with `--user`
+if [ "$1" = 'varnishd' ] && [ "$(id -u)" = '0' ]; then
+	chown -R varnish:varnish .
+fi
+
+exec "$@"

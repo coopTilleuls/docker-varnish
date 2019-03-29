@@ -14,7 +14,8 @@ ENV VMOD_BUILD_DEPS \
 		automake \
 		libtool \
 		make \
-		pkgconf
+		pkgconf \
+		python3
 
 # persistent / runtime deps
 RUN apk add --no-cache --virtual .persistent-deps \

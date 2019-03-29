@@ -22,7 +22,8 @@ ENV VMOD_BUILD_DEPS \
 		autotools-dev \
 		libtool \
 		make \
-		pkg-config
+		pkg-config \
+		python3
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \

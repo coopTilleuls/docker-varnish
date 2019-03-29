@@ -20,8 +20,7 @@ ENV VMOD_BUILD_DEPS \
 		automake \
 		libtool \
 		make \
-		pkgconf \
-		py3-docutils
+		pkgconf
 
 # persistent / runtime deps
 RUN apk add --no-cache --virtual .persistent-deps \
@@ -52,7 +51,6 @@ RUN set -eux; \
 		ncurses-dev \
 		patch \
 		pcre-dev \
-		py3-sphinx \
 	"; \
 	apk add --no-cache --virtual .build-deps $fetchDeps $buildDeps; \
 	\
@@ -76,6 +74,8 @@ RUN set -eux; \
 	./configure \
 		--build="$gnuArch" \
 		--without-jemalloc \
+		--with-rst2man=false \
+		--with-sphinx-build=false \
 	; \
 	make -j "$(nproc)"; \
 	make install; \

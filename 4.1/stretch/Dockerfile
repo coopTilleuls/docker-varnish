@@ -13,15 +13,7 @@ RUN set -eux; \
 		useradd -r -g varnish $user; \
 	done
 
-# prevent Debian's Varnish packages from being installed
-RUN set -eux; \
-	{ \
-		echo 'Package: varnish*'; \
-		echo 'Pin: release *'; \
-		echo 'Pin-Priority: -1'; \
-	} > /etc/apt/preferences.d/no-debian-varnish
-
-# dependencies required for building VMOD (Varnish modules)
+# dependencies required for building VMODs (Varnish modules)
 ENV VMOD_BUILD_DEPS \
 		autoconf-archive \
 		automake \
@@ -33,79 +25,108 @@ ENV VMOD_BUILD_DEPS \
 
 # persistent / runtime deps
 RUN apt-get update && apt-get install -y \
-		gcc \
-		libc6-dev \
+		apt-transport-https \
+		ca-certificates \
 	--no-install-recommends && rm -r /var/lib/apt/lists/*
-
-ENV VARNISH_VERSION 4.1.11
-ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-4.1.11.tgz
-ENV VARNISH_SHA256 f937a45116f3a7fbb38b2b5d7137658a4846409630bb9eccdbbb240e1a1379bc
 
 RUN set -eux; \
 	\
 	fetchDeps=' \
-		ca-certificates \
 		wget \
 	'; \
-	buildDeps=" \
-		$VMOD_BUILD_DEPS \
-		dpkg-dev \
-		libedit-dev \
-		libjemalloc-dev \
-		libncurses5-dev \
-		libpcre3-dev \
-	"; \
-	savedAptMark="$(apt-mark showmanual)"; \
+	if ! command -v gpg > /dev/null; then \
+		fetchDeps="$fetchDeps \
+			dirmngr \
+			gnupg \
+		"; \
+	fi; \
 	apt-get update; \
-	apt-get install -y --no-install-recommends $fetchDeps $buildDeps; \
+	apt-get install -y --no-install-recommends $fetchDeps; \
 	rm -rf /var/lib/apt/lists/*; \
 	\
-	wget -O varnish.tar.gz "$VARNISH_URL"; \
+	export GNUPGHOME="$(mktemp -d)"; \
+# key is not found on any keyserver, but we match its fingerprint
+	wget -O - 'https://packagecloud.io/varnishcache/varnish41/gpgkey' | gpg --batch --import; \
+	gpg --batch --export '14251B49A184B44E00B22B85FDBCAE9C0FC6FD2E' > /etc/apt/trusted.gpg.d/varnish.gpg; \
+	command -v gpgconf > /dev/null && gpgconf --kill all; \
+	rm -rf "$GNUPGHOME"; \
+	apt-key list; \
 	\
-	if [ -n "$VARNISH_SHA256" ]; then \
-		echo "$VARNISH_SHA256 *varnish.tar.gz" | sha256sum -c -; \
+	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false $fetchDeps
+
+ENV VARNISH_PACKAGE_VERSION 4.1.10-1~stretch
+
+RUN set -eux; \
+	\
+# see note below about "*.pyc" files
+	export PYTHONDONTWRITEBYTECODE=1; \
+	\
+	dpkgArch="$(dpkg --print-architecture)"; \
+	case "$dpkgArch" in \
+		amd64) \
+# arches officialy built by upstream
+			echo "deb https://packagecloud.io/varnishcache/varnish41/debian/ stretch main" > /etc/apt/sources.list.d/varnish.list; \
+			apt-get update; \
+			;; \
+		*) \
+# we're on an architecture upstream doesn't officially build for
+# let's build binaries from their published source packages
+			echo "deb-src https://packagecloud.io/varnishcache/varnish41/debian/ stretch main" > /etc/apt/sources.list.d/varnish.list; \
+			\
+			tempDir="$(mktemp -d)"; \
+			cd "$tempDir"; \
+			\
+			savedAptMark="$(apt-mark showmanual)"; \
+			\
+# build .deb files from upstream's source packages (which are verified by apt-get)
+			apt-get update; \
+			apt-get build-dep -y \
+				"varnish=$VARNISH_PACKAGE_VERSION" \
+			; \
+			DEB_BUILD_OPTIONS="nocheck parallel=$(nproc)" \
+				apt-get source --compile \
+					"varnish=$VARNISH_PACKAGE_VERSION" \
+			; \
+# we don't remove APT lists here because they get re-downloaded and removed later
+			\
+# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
+# (which is done after we install the built packages so we don't have to redownload any overlapping dependencies)
+			apt-mark showmanual | xargs apt-mark auto > /dev/null; \
+			apt-mark manual $savedAptMark; \
+			\
+# create a temporary local APT repo to install from (so that dependency resolution can be handled by APT, as it should be)
+			ls -lAFh; \
+			dpkg-scanpackages . > Packages; \
+			grep '^Package: ' Packages; \
+			echo "deb [ trusted=yes ] file://$tempDir ./" > /etc/apt/sources.list.d/temp.list; \
+# work around the following APT issue by using "Acquire::GzipIndexes=false" (overriding "/etc/apt/apt.conf.d/docker-gzip-indexes")
+#   Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
+#   ...
+#   E: Failed to fetch store:/var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages  Could not open file /var/lib/apt/lists/partial/_tmp_tmp.ODWljpQfkE_._Packages - open (13: Permission denied)
+			apt-get -o Acquire::GzipIndexes=false update; \
+			;; \
+	esac; \
+	\
+	apt-get install -y \
+		"varnish=$VARNISH_PACKAGE_VERSION" \
+	; \
+	\
+	rm -rf /var/lib/apt/lists/*; \
+	\
+	if [ -n "${tempDir:-}" ]; then \
+# if we have leftovers from building, let's purge them (including extra, unnecessary build deps)
+		apt-get purge -y --auto-remove; \
+		rm -rf "$tempDir" /etc/apt/sources.list.d/temp.list; \
 	fi; \
 	\
-	mkdir -p /usr/src/varnish; \
-	tar -zxf varnish.tar.gz -C /usr/src/varnish --strip-components=1; \
-	rm varnish.tar.gz; \
-	\
-	cd /usr/src/varnish; \
-	gnuArch="$(dpkg-architecture --query DEB_BUILD_GNU_TYPE)"; \
-	./autogen.sh; \
-	./configure \
-		--build="$gnuArch" \
-		--with-rst2man=$(command -v true) \
-		--with-sphinx-build=$(command -v true) \
-	; \
-	make -j "$(nproc)"; \
-	make install; \
-	ldconfig; \
-	\
-	cd /; \
-	rm -r /usr/src/varnish; \
-	\
-# reset apt-mark's "manual" list so that "purge --auto-remove" will remove all build dependencies
-	apt-mark auto '.*' > /dev/null; \
-	[ -z "$savedAptMark" ] || apt-mark manual $savedAptMark; \
-	find /usr/local -type f -executable -exec ldd '{}' ';' \
-		| awk '/=>/ { print $(NF-1) }' \
-		| sort -u \
-		| xargs -r dpkg-query --search \
-		| cut -d: -f1 \
-		| sort -u \
-		| xargs -r apt-mark manual \
-	; \
-	apt-get purge -y --auto-remove -o APT::AutoRemove::RecommendsImportant=false; \
-	\
-	varnishd -V
+# some of the steps above generate a lot of "*.pyc" files (and setting "PYTHONDONTWRITEBYTECODE" beforehand doesn't propagate properly for some reason), so we clean them up manually (as long as they aren't owned by a package)
+	find /usr -name '*.pyc' -type f -exec bash -c 'for pyc; do dpkg -S "$pyc" &> /dev/null || rm -vf "$pyc"; done' -- '{}' +
 
-WORKDIR /usr/local/var/varnish
-RUN chown -R varnish:varnish /usr/local/var/varnish
-VOLUME /usr/local/var/varnish
+WORKDIR /var/lib/varnish
+VOLUME /var/lib/varnish
 
 COPY docker-varnish-entrypoint /usr/local/bin/
 ENTRYPOINT ["docker-varnish-entrypoint"]
 
 EXPOSE 80
-CMD ["varnishd", "-F", "-f", "/usr/local/etc/varnish/default.vcl"]
+CMD ["varnishd", "-F", "-f", "/etc/varnish/default.vcl"]

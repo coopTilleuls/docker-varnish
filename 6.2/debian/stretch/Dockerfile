@@ -1,8 +1,14 @@
-FROM %%DISTRIBUTION%%:%%RELEASE%%
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
+FROM debian:stretch-slim
 
 RUN apt-get update && \
     apt-get install -y curl && \
-    curl -s https://packagecloud.io/install/repositories/varnishcache/varnish%%VARNISH_VERSION%%/script.deb.sh |  bash && \
+    curl -s https://packagecloud.io/install/repositories/varnishcache/varnish62/script.deb.sh |  bash && \
     apt-get update && \
     apt-get install -y varnish && \
     rm -rf /var/lib/apt/lists/*

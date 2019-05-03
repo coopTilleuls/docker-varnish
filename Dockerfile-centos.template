@@ -1,0 +1,13 @@
+FROM %%DISTRIBUTION%%:%%RELEASE%%
+
+RUN curl -s https://packagecloud.io/install/repositories/varnishcache/varnish%%VARNISH_VERSION%%/script.rpm.sh |  bash && \
+    yum install epel-release -y && \
+    yum install -y varnish
+
+WORKDIR /etc/varnish
+
+COPY docker-varnish-entrypoint /usr/local/bin/
+ENTRYPOINT ["docker-varnish-entrypoint"]
+
+EXPOSE 80
+CMD ["varnishd", "-F", "-f", "/etc/varnish/default.vcl"]

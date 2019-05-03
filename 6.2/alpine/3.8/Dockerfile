@@ -4,6 +4,12 @@
 # PLEASE DO NOT EDIT IT DIRECTLY.
 #
 
+#
+# NOTE: THIS DOCKERFILE IS GENERATED VIA "update.sh"
+#
+# PLEASE DO NOT EDIT IT DIRECTLY.
+#
+
 FROM alpine:3.8
 
 RUN apk add git alpine-sdk && \

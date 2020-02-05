@@ -29,9 +29,9 @@ RUN apk add --no-cache --virtual .persistent-deps \
 		libc-dev \
 		libgcc
 
-ENV VARNISH_VERSION 6.2.0
-ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-6.2.0.tgz
-ENV VARNISH_SHA256 c37af353aca25a83d22f9c5ce0ae800fe433e4d02e1457e02886a5849f988e53
+ENV VARNISH_VERSION 6.2.3
+ENV VARNISH_URL https://varnish-cache.org/_downloads/varnish-6.2.3.tgz
+ENV VARNISH_SHA256 5ecbd05e345e7f7ef0082b916edab3597ee9962058102bccb0a4055920be6609
 
 COPY *.patch /varnish-alpine-patches/
 
